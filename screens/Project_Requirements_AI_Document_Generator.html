@@ -1,0 +1,41 @@
+# Project Overview: AI Document Generator (Frontend Breakdown)
+
+## Core Screens & Priority
+
+### 1. Home / Input (High Priority)
+*   **Purpose:** Initial landing and data entry.
+*   **Key Features:** Large textarea for notes, Drag & Drop file upload (PDF, DOCX, TXT), "Generate Document" button.
+*   **Style:** Minimal and clean.
+
+### 2. Configure (High Priority)
+*   **Purpose:** Setting parameters before generation.
+*   **Key Features:** 
+    *   **Doc Type:** Visual cards (College Report, README, Research Paper, Grant Proposal).
+    *   **Tone Selector:** Radio buttons (Formal, Neutral, Technical).
+    *   **Model Selector:** "Local FLAN model" vs "Claude API" (Prominent toggle).
+
+### 3. Agent Progress (High Priority - "The Showstopper")
+*   **Purpose:** Visualizing the AI pipeline in real-time.
+*   **Key Features:** Animated stepper showing agent states:
+    *   [✓] Understanding Agent — "Extracted 7 key topics"
+    *   [⟳] Structure Agent — "Organizing into sections..."
+    *   [ ] Rewrite Agent — Waiting...
+    *   [ ] Formatting — Waiting...
+
+### 4. Preview (High Priority)
+*   **Purpose:** Reviewing the generated content.
+*   **Key Features:** Rendered document view (styled headings/body), scrollable panel looking like a real page.
+
+### 5. Export (High Priority)
+*   **Purpose:** Finalizing and downloading.
+*   **Key Features:** Large "Download .docx" and "Download .pdf" buttons, file metadata, "Regenerate" option.
+
+## Components & Details
+*   **Navbar:** Logo, history link, model status badge.
+*   **Special Touch:** "Local vs Cloud" badge that lights up green when running offline.
+
+## "Nice to Have" Features
+*   History of past documents.
+*   Tone selector (formal/casual).
+*   Local vs cloud model toggle.
+*   Section editor after generation.

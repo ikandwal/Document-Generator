@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+@layer utilities {
+  .bg-studio-gradient {
+    background: linear-gradient(135deg, #24389c 0%, #3f51b5 100%);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .lab-grid {
+    background-image: radial-gradient(circle, #c5c5d4 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.15;
+  }
+  .stepper-gradient-line {
+    background: linear-gradient(to bottom, #24389c, #3f51b5, #c5c5d4);
+  }
+}

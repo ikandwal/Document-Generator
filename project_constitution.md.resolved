@@ -1,0 +1,35 @@
+# Smart Documentation Automation Platform - Constitution
+
+## Vision & Problem Statement
+The Smart Documentation Automation Platform is an AI-powered hybrid system that converts raw, unorganized notes into well-structured, professionally formatted documentation. It addresses the time-consuming process of restructuring notes for different formats by embracing a "Write once, generate many formats" philosophy.
+
+## Objectives
+- Automate document structuring and formatting from unstructured inputs.
+- Support a hybrid architecture combining local AI inference (privacy/offline) with cloud AI (advanced reasoning).
+- Drastically reduce manual formatting effort to increase productivity.
+
+## Core Features
+- **Multi-Source Input:** Accepts plain text, PDF, and DOCX.
+- **Intent-Based Generation:** Targets specific output types (e.g., College Project Report).
+- **Hybrid AI Pipeline (The 3 Agents):**
+  1. **Understanding Agent (Local):** Uses FLAN-T5 Small running locally to extract key topics without internet access. Fast and privacy-preserving.
+  2. **Structure Agent (Cloud):** Uses Anthropic Claude to intelligently map topics into a structured JSON section format based on the chosen document intent.
+  3. **Rewrite Agent (Cloud):** Uses Anthropic Claude to professionalize and polish the section content.
+- **Multiple Output Formats:** Generates formatted DOCX, with future extensibility to PDF, Markdown, etc.
+
+## Architecture & Tech Stack
+- **Backend:** Python, FastAPI
+- **File Parsing:** PyMuPDF (`fitz`), `python-docx`
+- **AI Models:** 
+  - Local FLAN-T5-small (via Hugging Face `transformers` & PyTorch)
+  - Claude API (Anthropic `claude-3-5-sonnet-20241022`)
+- **Document Gen:** `python-docx`, `docx2pdf`
+
+## Execution Pipeline
+`Raw Input -> [Parsers] -> [FLAN-T5 Understanding] -> [Claude Structuring] -> [Claude Rewriting] -> [DOCX Template] -> File Output`
+
+## Development Guidelines
+- Load all configurations securely (e.g., via `.env`).
+- Ensure fully async operations where applicable in FastAPI.
+- Isolate the Agent concerns cleanly for reusability.
+- Manage temporary files carefully and organize outputs.

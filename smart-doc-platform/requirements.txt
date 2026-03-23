@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+google-generativeai
+python-docx
+PyMuPDF
+docx2pdf
+python-dotenv
+python-multipart
+transformers
+torch
+sentencepiece
