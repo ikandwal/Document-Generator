@@ -3,7 +3,8 @@ from fastapi.responses import FileResponse
 import os
 import time
 import shutil
-from typing import Optional
+from typing import Optional, List
+from pydantic import BaseModel
 
 from parsers.pdf_parser import parse_pdf
 from parsers.docx_parser import parse_docx
@@ -13,6 +14,18 @@ from agents.rewrite_agent import run_rewrite_agent
 from templates.college_report import generate_college_report
 
 router = APIRouter()
+
+class Section(BaseModel):
+    heading: str
+    content: str
+
+class DocumentData(BaseModel):
+    title: str
+    sections: List[Section]
+
+class ExportRequest(BaseModel):
+    document_data: DocumentData
+    doc_type: str
 
 @router.post("/generate")
 async def generate_document(
@@ -55,12 +68,25 @@ async def generate_document(
         # Agent 3: Rewrite (Gemini)
         polished_data = run_rewrite_agent(structured_data)
         
-        # Generate final file (python-docx template)
+        return {
+            "status": "success",
+            "document_data": polished_data
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/export/docx")
+async def export_docx(req: ExportRequest):
+    try:
         timestamp = int(time.time())
-        output_filename = f"{doc_type.replace(' ', '_').lower()}_{timestamp}.docx"
+        output_filename = f"{req.doc_type.replace(' ', '_').lower()}_{timestamp}.docx"
+        
+        # Ensure outputs directory exists
+        os.makedirs("outputs", exist_ok=True)
         output_path = os.path.join("outputs", output_filename)
         
-        final_path = generate_college_report(polished_data, output_path)
+        # Pydantic dict() converts it to match the expected structured format
+        final_path = generate_college_report(req.document_data.model_dump(), output_path)
         
         return FileResponse(
             path=final_path,
@@ -68,4 +94,8 @@ async def generate_document(
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
     except Exception as e:
+        print(f"Export Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+

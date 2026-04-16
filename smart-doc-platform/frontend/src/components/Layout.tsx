@@ -20,9 +20,9 @@ export function Layout() {
   const isActive = (p: string) => currentPath === p;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background font-body">
+    <div className="flex h-screen overflow-hidden bg-background font-body print:block print:h-auto print:bg-white print:overflow-visible">
       {/* SideNavBar */}
-      <aside className="flex flex-col h-screen p-4 gap-4 w-64 bg-[#eceef0] transition-all duration-200 shrink-0">
+      <aside className="flex flex-col h-screen p-4 gap-4 w-64 bg-[#eceef0] transition-all duration-200 shrink-0 print:hidden">
         <div className="flex items-center gap-3 px-2 mb-4">
           <div className="w-10 h-10 rounded-xl bg-studio-gradient flex items-center justify-center text-on-primary">
             <span className="material-symbols-outlined text-sm">science</span>
@@ -68,9 +68,9 @@ export function Layout() {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden bg-surface relative">
+      <main className="flex-1 flex flex-col overflow-hidden bg-surface relative print:block print:overflow-visible">
         {/* TopAppBar */}
-        <header className="flex justify-between items-center px-8 h-16 w-full max-w-none bg-[#f8f9fb] font-headline tracking-tight antialiased z-10 shrink-0">
+        <header className="flex justify-between items-center px-8 h-16 w-full max-w-none bg-[#f8f9fb] font-headline tracking-tight antialiased z-10 shrink-0 print:hidden">
           <div className="flex items-center gap-6">
             <span className="text-xl font-bold tracking-[-0.02em] text-[#191c1e]">Synthetix Studio</span>
             <div className="h-4 w-px bg-outline-variant/30 hidden md:block"></div>

@@ -1,58 +1,132 @@
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentStore } from '../store/useDocumentStore';
+import { exportDocx } from '../services/api';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 export default function PreviewExport() {
   const navigate = useNavigate();
-  const { architecture } = useDocumentStore();
+  const { architecture, documentData, updateDocumentData } = useDocumentStore();
   const archName = architecture.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const printRef = useRef<HTMLDivElement>(null);
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+  React.useEffect(() => {
+    if (!documentData) {
+      navigate('/configure');
+    }
+  }, [documentData, navigate]);
+
+  const handleSectionInput = (index: number, e: React.FormEvent<HTMLParagraphElement>) => {
+    if (documentData) {
+      const newSections = [...documentData.sections];
+      newSections[index].content = e.currentTarget.textContent || '';
+      updateDocumentData(documentData.title, newSections);
+    }
+  };
+
+  const downloadPdf = () => {
+    // Native print guarantees perfect formatting, avoiding html2pdf zoom/cutoff glitches.
+    window.print();
+  };
+
+  const downloadDocx = async () => {
+    if (!documentData) return;
+    setIsExportingDocx(true);
+    try {
+      const result = await exportDocx(documentData, architecture);
+      const url = URL.createObjectURL(result.blob);
+      const a = document.createElement('a');
+      const filenameObj = documentData.title 
+        ? `${documentData.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.docx`
+        : result.filename;
+
+      a.href = url;
+      a.download = filenameObj;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch(err) {
+      console.error(err);
+      alert("Failed to export docx. Ensure backend is running and 'outputs' folder is accessible.");
+    }
+    setIsExportingDocx(false);
+  };
+
+  if (!documentData) return null;
 
   return (
-    <main className="flex-1 flex overflow-hidden p-8 gap-12 bg-surface">
-      <div className="flex-[3] flex flex-col min-w-0">
-        <div className="flex items-center justify-between mb-4">
+    <main className="flex-1 flex overflow-hidden p-8 gap-12 bg-surface print:p-0 print:block print:bg-white print:overflow-visible">
+      <div className="flex-[3] flex flex-col min-w-0 print:block">
+        <div className="flex items-center justify-between mb-4 print:hidden">
           <h2 className="text-3xl font-headline font-extrabold tracking-tight text-on-background">Document Preview</h2>
-          <div className="text-sm text-on-surface-variant uppercase tracking-widest font-semibold">Draft v2.4</div>
         </div>
-        <div className="flex-1 bg-surface-container-low rounded-xl p-1 overflow-hidden relative">
-          <div className="h-full w-full overflow-y-auto no-scrollbar bg-surface-container-low px-12 py-16 flex flex-col items-center">
-            {/* The Printed Page Aesthetic */}
-            <div className="w-full max-w-[800px] bg-surface-container-lowest shadow-[0_20px_40px_rgba(25,28,30,0.04)] min-h-[1100px] p-24 font-body leading-relaxed text-on-surface">
-              <header className="mb-12 border-b border-outline-variant/10 pb-8">
-                <h1 className="text-3xl font-headline font-bold text-on-background mb-4">Architectural Resilience in Distributed LLM Systems</h1>
-                <div className="flex gap-4 text-sm text-on-surface-variant">
-                  <span>Oct 24, 2026</span>
-                  <span>•</span>
-                  <span>Synthetix Research Lab</span>
-                </div>
+        <div className="flex-1 bg-surface-container-low rounded-xl p-1 overflow-hidden relative print:p-0 print:bg-white print:rounded-none mt-1">
+          <div className="h-full w-full overflow-y-auto no-scrollbar bg-surface-container-low px-12 py-16 flex flex-col items-center print:px-0 print:py-0 print:bg-white print:overflow-visible">
+            {/* The Printed Page Aesthetic (Matches Word Doc Format) */}
+            <div ref={printRef} className="w-[8.27in] h-max min-h-[11.69in] pb-[2in] bg-white shadow-xl p-[1in] font-serif text-black relative mb-12 print:shadow-none print:m-0 print:w-full print:p-0">
+              <header className="mb-0">
+                <h1 
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) => {
+                     if (documentData) updateDocumentData(e.currentTarget.textContent || '', documentData.sections);
+                  }}
+                  className="text-center font-bold pb-4 outline-none border border-transparent hover:border-gray-200 focus:border-blue-500 rounded transition-colors"
+                  style={{ fontSize: '20pt', fontFamily: '"Times New Roman", Times, serif' }}
+                >
+                  {documentData.title}
+                </h1>
               </header>
-              <section className="space-y-6">
-                <h3 className="text-lg font-headline font-bold text-on-background">1. Abstract</h3>
-                <p className="text-on-surface/90 text-[15px] leading-[1.8]">
-                  This paper explores the convergence of edge computing and large language models (LLMs). We propose a framework for "Local-First" intelligence that minimizes dependency on cloud-based API architectures. By leveraging optimized quantization techniques, we demonstrate that inference latency can be reduced by 40% without significant loss in semantic accuracy.
-                </p>
-                <h3 className="text-lg font-headline font-bold text-on-background">2. Methodology</h3>
-                <p className="text-on-surface/90 text-[15px] leading-[1.8]">
-                  Our approach utilized the FLAN-T5 XL model, compressed via 4-bit NormalFloat (NF4) quantization. Testing was conducted across three distinct hardware environments: a local workstation (RTX 4090), a mobile edge device, and a centralized cloud cluster.
-                </p>
-                <div className="my-10 p-8 bg-surface-container-high rounded-lg italic text-on-surface-variant border-l-4 border-primary">
-                  "The transition from centralized to decentralized intelligence represents the next major paradigm shift in human-computer interaction."
-                </div>
-                <h3 className="text-lg font-headline font-bold text-on-background">3. Initial Results</h3>
-                <p className="text-on-surface/90 text-[15px] leading-[1.8]">
-                  Preliminary data indicates a consistent performance gain in latency-sensitive applications, particularly in document synthesis and real-time code generation tasks.
-                </p>
+              <section className="space-y-0">
+                {documentData.sections.map((sec: any, idx: number) => {
+                  // Clean up markdown artifacts generated by LLM
+                  let cleanHeading = sec.heading.replace(/^#+\s*/, '').replace(/\*\*/g, '').replace(/^Heading:\s*/i, '').trim();
+                  let cleanContent = sec.content.replace(/^#+\s*.*?\n/, '').replace(/\*\*/g, '').replace(/^Content:\s*/i, '').trim();
+                  
+                  // Sometimes the LLM duplicates the heading right at the start of the content block
+                  if (cleanContent.toLowerCase().startsWith(cleanHeading.toLowerCase())) {
+                     cleanContent = cleanContent.substring(cleanHeading.length).trim();
+                  }
+                  // And sometimes it adds "Heading: [Head]"
+                  if (cleanContent.toLowerCase().startsWith("heading: " + cleanHeading.toLowerCase())) {
+                     cleanContent = cleanContent.substring(("heading: " + cleanHeading).length).trim();
+                  }
+                  
+                  return (
+                    <div key={idx} className="group relative" style={{ pageBreakInside: 'avoid' }}>
+                      <h3 
+                        className="font-bold pt-[12pt] pb-[6pt]"
+                        style={{ fontSize: '14pt', fontFamily: '"Times New Roman", Times, serif' }}
+                      >
+                        {cleanHeading}
+                      </h3>
+                      <p 
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => handleSectionInput(idx, e)}
+                        className="outline-none border border-transparent hover:border-gray-200 focus:border-blue-500 focus:bg-blue-50/30 rounded px-2 -mx-2 transition-colors whitespace-pre-wrap text-justify print:p-0 print:m-0"
+                        style={{ fontSize: '12pt', fontFamily: '"Times New Roman", Times, serif', lineHeight: '1.5', paddingBottom: '6pt' }}
+                      >
+                        {cleanContent}
+                      </p>
+                    </div>
+                  );
+                })}
               </section>
-              <footer className="mt-24 text-center text-xs text-outline font-label tracking-widest uppercase">
-                  Page 1 of 3
-              </footer>
+              <div className="absolute bottom-[0.5in] left-0 right-0 text-center hidden print:block" style={{ fontSize: '10pt', fontFamily: '"Times New Roman", Times, serif' }}>
+                Generated by Synthetix Platform
+              </div>
             </div>
           </div>
-          <div className="absolute inset-0 pointer-events-none border border-white/40 rounded-xl"></div>
         </div>
       </div>
       
       {/* Right: Action Panel */}
-      <aside className="flex-1 min-w-[320px] flex flex-col gap-8">
+      <aside className="flex-1 min-w-[320px] flex flex-col gap-8 print:hidden">
         <section>
           <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-4">Document Metadata</h3>
           <div className="bg-surface-container-lowest rounded-xl p-6 space-y-4 shadow-sm">
@@ -62,11 +136,11 @@ export default function PreviewExport() {
             </div>
             <div className="flex justify-between items-center py-2 border-b border-outline-variant/10">
               <span className="text-sm text-on-surface-variant">Generated</span>
-              <span className="text-sm font-semibold text-on-surface">Oct 2026</span>
+              <span className="text-sm font-semibold text-on-surface">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm text-on-surface-variant">Pages</span>
-              <span className="text-sm font-semibold text-on-surface">3</span>
+              <span className="text-sm text-on-surface-variant">Sections</span>
+              <span className="text-sm font-semibold text-on-surface">{documentData.sections.length}</span>
             </div>
           </div>
         </section>
@@ -74,25 +148,36 @@ export default function PreviewExport() {
         <section className="flex-1">
           <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-4">Export</h3>
           <div className="grid grid-cols-1 gap-4">
-            <button className="group relative flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-low rounded-xl transition-all duration-300 border border-outline-variant/10 hover:border-primary/30">
+            <button 
+              onClick={downloadPdf}
+              className="group relative flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-low rounded-xl transition-all duration-300 border border-outline-variant/10 hover:border-primary/30"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-error-container/20 flex items-center justify-center text-error">
-                  <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>picture_as_pdf</span>
+                   <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>picture_as_pdf</span>
                 </div>
                 <div className="text-left">
                   <div className="font-bold text-on-surface">Download .pdf</div>
-                  <div className="text-xs text-on-surface-variant">High-fidelity print format</div>
+                  <div className="text-xs text-on-surface-variant">High-fidelity native print</div>
                 </div>
               </div>
               <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors">download</span>
             </button>
-            <button className="group relative flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-low rounded-xl transition-all duration-300 border border-outline-variant/10 hover:border-primary/30">
+            <button 
+              onClick={downloadDocx}
+              disabled={isExportingDocx}
+              className="group relative flex items-center justify-between p-5 bg-surface-container-lowest hover:bg-surface-container-low rounded-xl transition-all duration-300 border border-outline-variant/10 hover:border-primary/30 disabled:opacity-50"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>description</span>
+                  {isExportingDocx ? (
+                    <span className="material-symbols-outlined animate-spin">sync</span>
+                  ) : (
+                    <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>description</span>
+                  )}
                 </div>
                 <div className="text-left">
-                  <div className="font-bold text-on-surface">Download .docx</div>
+                  <div className="font-bold text-on-surface">{isExportingDocx ? 'Generating...' : 'Download .docx'}</div>
                   <div className="text-xs text-on-surface-variant">Editable Word document</div>
                 </div>
               </div>
@@ -102,13 +187,9 @@ export default function PreviewExport() {
         </section>
         
         <div className="mt-auto space-y-3 pb-8">
-          <button className="w-full py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold rounded-md shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
-            <span className="material-symbols-outlined text-[20px]">send</span>
-            Finalize & Publish
-          </button>
-          <button className="w-full py-4 bg-transparent border border-outline-variant/30 hover:bg-surface-container text-on-surface font-semibold rounded-md transition-all duration-200 flex items-center justify-center gap-2" onClick={() => navigate('/configure')}>
+          <button className="w-full py-4 bg-transparent border border-outline-variant/30 hover:bg-surface-container-low text-on-surface font-semibold rounded-md transition-all duration-200 flex items-center justify-center gap-2" onClick={() => navigate('/configure')}>
             <span className="material-symbols-outlined text-[20px]">refresh</span>
-            Regenerate
+            Regenerate Document
           </button>
         </div>
       </aside>

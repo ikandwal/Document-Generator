@@ -1,13 +1,34 @@
 import { useNavigate } from 'react-router-dom';
 import { useDocumentStore } from '../store/useDocumentStore';
+import { generateDocument } from '../services/api';
 
 export default function Configure() {
   const navigate = useNavigate();
   const { 
+    sourceText, uploadedFiles,
     architecture, setArchitecture, 
     editorialTone, setEditorialTone,
-    useLocalModel, toggleLocalModel
+    useLocalModel, toggleLocalModel,
+    isGenerating,
+    startGeneration, setGenerationStage, setGenerationError, setDocumentData
   } = useDocumentStore();
+
+  const handleGenerate = async () => {
+    startGeneration();
+    navigate('/progress');
+    try {
+      const result = await generateDocument(
+        sourceText,
+        uploadedFiles,
+        architecture,
+        (stage) => setGenerationStage(stage)
+      );
+      setDocumentData(result);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error occurred.';
+      setGenerationError(msg);
+    }
+  };
 
   return (
     <div className="flex-1 overflow-y-auto p-12 bg-surface relative z-10">
@@ -186,9 +207,22 @@ export default function Configure() {
         </div>
         
         <div className="pt-8 flex justify-center pb-12">
-           <button className="px-12 py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold rounded-xl shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all flex items-center gap-3" onClick={() => navigate('/progress')}>
-              <span className="material-symbols-outlined">bolt</span>
-              Start Generation
+           <button
+             className="px-12 py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold rounded-xl shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all flex items-center gap-3 disabled:opacity-60 disabled:scale-100 disabled:cursor-not-allowed"
+             onClick={handleGenerate}
+             disabled={isGenerating}
+           >
+             {isGenerating ? (
+               <>
+                 <span className="material-symbols-outlined animate-spin">progress_activity</span>
+                 Generating…
+               </>
+             ) : (
+               <>
+                 <span className="material-symbols-outlined">bolt</span>
+                 Start Generation
+               </>
+             )}
            </button>
         </div>
       </div>

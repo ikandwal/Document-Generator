@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -30,8 +31,18 @@ def run_structure_agent(topics: str, doc_type: str) -> dict:
     user_prompt = f"Document type: {doc_type}\n\nKey topics:\n{topics}\n\nOrganize this into a proper {doc_type} structure. Return only JSON."
     
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
-        response = model.generate_content(user_prompt)
+        model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_prompt)
+        for attempt in range(4):
+            try:
+                response = model.generate_content(user_prompt)
+                break
+            except Exception as e:
+                if '429' in str(e) and attempt < 3:
+                    wait = 15 * (attempt + 1)
+                    print(f"Rate limited (attempt {attempt+1}). Waiting {wait}s...")
+                    time.sleep(wait)
+                else:
+                    raise e
         
         # Safely parse JSON
         raw_output = response.text.strip()
