@@ -7,7 +7,7 @@ import html2pdf from 'html2pdf.js';
 
 export default function PreviewExport() {
   const navigate = useNavigate();
-  const { architecture, documentData, updateDocumentData } = useDocumentStore();
+  const { architecture, architectureSubtype, documentData, updateDocumentData } = useDocumentStore();
   const archName = architecture.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   const printRef = useRef<HTMLDivElement>(null);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
@@ -36,7 +36,7 @@ export default function PreviewExport() {
     if (!documentData) return;
     setIsExportingDocx(true);
     try {
-      const result = await exportDocx(documentData, architecture);
+      const result = await exportDocx(documentData, architecture, architectureSubtype);
       const url = URL.createObjectURL(result.blob);
       const a = document.createElement('a');
       const filenameObj = documentData.title 

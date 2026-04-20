@@ -23,11 +23,13 @@ interface DocumentState {
 
   // Configuration State
   architecture: string;
+  architectureSubtype: string;
   editorialTone: string;
   useLocalModel: boolean;
 
   // Configuration Actions
   setArchitecture: (arch: string) => void;
+  setArchitectureSubtype: (subtype: string) => void;
   setEditorialTone: (tone: string) => void;
   toggleLocalModel: () => void;
 
@@ -80,10 +82,12 @@ Key considerations include thermal constraints and battery depletion on consumer
 
   // Defaults
   architecture: 'college_report',
+  architectureSubtype: '',
   editorialTone: 'formal',
   useLocalModel: true,
 
-  setArchitecture: (arch) => set({ architecture: arch }),
+  setArchitecture: (arch) => set({ architecture: arch, architectureSubtype: '' }),
+  setArchitectureSubtype: (subtype) => set({ architectureSubtype: subtype }),
   setEditorialTone: (tone) => set({ editorialTone: tone }),
   toggleLocalModel: () => set((state) => ({ useLocalModel: !state.useLocalModel })),
 
@@ -107,7 +111,8 @@ Key considerations include thermal constraints and battery depletion on consumer
       tokens: state.tokenCount || calculateTokens(state.sourceText, state.uploadedFiles),
       tone: state.editorialTone.charAt(0).toUpperCase() + state.editorialTone.slice(1),
       documentData: data,
-      architecture: state.architecture
+      architecture: state.architecture,
+      architectureSubtype: state.architectureSubtype
     };
     return {
       isGenerating: false, 
@@ -123,6 +128,7 @@ Key considerations include thermal constraints and battery depletion on consumer
   loadDocument: (doc) => set({
     documentData: doc.documentData,
     architecture: doc.architecture,
+    architectureSubtype: doc.architectureSubtype || '',
     editorialTone: doc.tone.toLowerCase(),
   }),
 }),
@@ -134,7 +140,8 @@ Key considerations include thermal constraints and battery depletion on consumer
         savedDocuments: state.savedDocuments,
         documentData: state.documentData,
         sourceText: state.sourceText,
-        architecture: state.architecture
+        architecture: state.architecture,
+        architectureSubtype: state.architectureSubtype
       }),
     }
   )

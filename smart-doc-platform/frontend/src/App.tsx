@@ -7,11 +7,13 @@ import Library from './pages/Library';
 import Settings from './pages/Settings';
 import Support from './pages/Support';
 import Archive from './pages/Archive';
+import Login from './pages/Login';
 import { Layout } from './components/Layout';
 
 function App() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
       <Route element={<Layout />}>
         <Route path="/" element={<HomeInput />} />
         <Route path="/configure" element={<Configure />} />

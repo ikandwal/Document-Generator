@@ -9,10 +9,14 @@ export async function generateDocument(
   rawText: string,
   files: File[],
   docType: string,
+  docSubtype: string,
   onStageChange: (stage: number) => void
 ): Promise<any> {
   const formData = new FormData();
   formData.append('doc_type', docType);
+  if (docSubtype) {
+    formData.append('doc_subtype', docSubtype);
+  }
 
   if (files.length > 0) {
     formData.append('file', files[0]); // primary file
@@ -51,13 +55,13 @@ export async function generateDocument(
   }
 }
 
-export async function exportDocx(documentData: any, docType: string): Promise<{ blob: Blob, filename: string }> {
+export async function exportDocx(documentData: any, docType: string, docSubtype?: string): Promise<{ blob: Blob, filename: string }> {
   const response = await fetch(`${API_BASE}/export/docx`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ document_data: documentData, doc_type: docType }),
+    body: JSON.stringify({ document_data: documentData, doc_type: docType, doc_subtype: docSubtype }),
   });
 
   if (!response.ok) {

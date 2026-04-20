@@ -7,6 +7,7 @@ export default function Configure() {
   const { 
     sourceText, uploadedFiles,
     architecture, setArchitecture, 
+    architectureSubtype, setArchitectureSubtype,
     editorialTone, setEditorialTone,
     useLocalModel, toggleLocalModel,
     isGenerating,
@@ -21,6 +22,7 @@ export default function Configure() {
         sourceText,
         uploadedFiles,
         architecture,
+        architectureSubtype,
         (stage) => setGenerationStage(stage)
       );
       setDocumentData(result);
@@ -207,6 +209,51 @@ export default function Configure() {
             </div>
           </div>
         </section>
+        
+        {(architecture === 'grant_proposal' || architecture === 'research_paper') && (
+          <section>
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <h3 className="font-headline text-2xl font-extrabold tracking-tight text-on-surface">Document Subtype</h3>
+                <p className="text-on-surface-variant mt-2">Select the specific format for your {architecture === 'grant_proposal' ? 'Grant Proposal' : 'Research Paper'}.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {architecture === 'grant_proposal' && [
+                'Research Grant Proposal',
+                'Project Grant Proposal',
+                'Program Grant Proposal',
+                'Seed Grant Proposal'
+              ].map((subtype) => (
+                <label key={subtype} className={`group cursor-pointer flex items-center justify-between p-4 rounded-xl ring-1 ring-inset transition-colors ${architectureSubtype === subtype ? 'bg-primary/5 ring-primary/50' : 'bg-surface-container-lowest ring-outline-variant/10 hover:bg-primary/5 hover:ring-primary/20'}`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`material-symbols-outlined ${architectureSubtype === subtype ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary'}`}>
+                      {architectureSubtype === subtype ? 'radio_button_checked' : 'radio_button_unchecked'}
+                    </span>
+                    <span className="font-semibold text-sm text-on-surface">{subtype}</span>
+                  </div>
+                  <input type="radio" className="hidden" name="subtype" value={subtype} checked={architectureSubtype === subtype} onChange={() => setArchitectureSubtype(subtype)} />
+                </label>
+              ))}
+              {architecture === 'research_paper' && [
+                'Analytical Research Paper',
+                'Argumentative (Persuasive) Paper',
+                'Experimental Research Paper',
+                'Survey/Review Paper'
+              ].map((subtype) => (
+                <label key={subtype} className={`group cursor-pointer flex items-center justify-between p-4 rounded-xl ring-1 ring-inset transition-colors ${architectureSubtype === subtype ? 'bg-primary/5 ring-primary/50' : 'bg-surface-container-lowest ring-outline-variant/10 hover:bg-primary/5 hover:ring-primary/20'}`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`material-symbols-outlined ${architectureSubtype === subtype ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary'}`}>
+                      {architectureSubtype === subtype ? 'radio_button_checked' : 'radio_button_unchecked'}
+                    </span>
+                    <span className="font-semibold text-sm text-on-surface">{subtype}</span>
+                  </div>
+                  <input type="radio" className="hidden" name="subtype" value={subtype} checked={architectureSubtype === subtype} onChange={() => setArchitectureSubtype(subtype)} />
+                </label>
+              ))}
+            </div>
+          </section>
+        )}
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <section>

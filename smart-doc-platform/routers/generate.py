@@ -16,6 +16,8 @@ from templates.technical_readme import generate_technical_readme
 from templates.code_walkthrough import generate_code_walkthrough
 from templates.proof_of_concept import generate_proof_of_concept
 from templates.order_in_council import generate_order_in_council
+from templates.grant_proposal import generate_grant_proposal
+from templates.research_paper import generate_research_paper
 
 router = APIRouter()
 
@@ -30,10 +32,12 @@ class DocumentData(BaseModel):
 class ExportRequest(BaseModel):
     document_data: DocumentData
     doc_type: str
+    doc_subtype: Optional[str] = None
 
 @router.post("/generate")
 async def generate_document(
     doc_type: str = Form(...),
+    doc_subtype: Optional[str] = Form(None),
     raw_text: Optional[str] = Form(None),
     file: Optional[UploadFile] = File(None)
 ):
@@ -67,7 +71,7 @@ async def generate_document(
         topics = run_understanding_agent(text_content)
         
         # Agent 2: Structure (Gemini)
-        structured_data = run_structure_agent(topics, doc_type)
+        structured_data = run_structure_agent(topics, doc_type, doc_subtype)
         
         # Agent 3: Rewrite (Gemini)
         polished_data = run_rewrite_agent(structured_data)
@@ -101,6 +105,10 @@ async def export_docx(req: ExportRequest):
             final_path = generate_proof_of_concept(req.document_data.model_dump(), output_path)
         elif req.doc_type == 'order_in_council':
             final_path = generate_order_in_council(req.document_data.model_dump(), output_path)
+        elif req.doc_type == 'grant_proposal':
+            final_path = generate_grant_proposal(req.document_data.model_dump(), output_path, req.doc_subtype)
+        elif req.doc_type == 'research_paper':
+            final_path = generate_research_paper(req.document_data.model_dump(), output_path, req.doc_subtype)
         else:
             # Fallback
             final_path = generate_college_report(req.document_data.model_dump(), output_path)
