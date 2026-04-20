@@ -55,7 +55,7 @@ export default function Configure() {
                   </div>
                 </div>
                 <div className="mt-4 relative transition-transform duration-300">
-                  <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'college_report' ? 'text-primary drop-shadow-[0_0_8px_rgba(36,56,156,0.3)]' : 'text-primary'}`}>school</span>
+                  <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'college_report' ? 'text-primary drop-shadow-[0_0_8px_rgba(163,44,196,0.4)]' : 'text-primary'}`}>school</span>
                   <h4 className="font-semibold text-on-surface">College Report</h4>
                   <p className="text-xs text-on-surface-variant mt-1">Academic formatting with citations</p>
                 </div>
@@ -77,7 +77,7 @@ export default function Configure() {
                   </div>
                 </div>
                 <div className="mt-4 relative transition-transform duration-300">
-                  <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'readme' ? 'text-primary drop-shadow-[0_0_8px_rgba(36,56,156,0.3)]' : 'text-primary'}`}>description</span>
+                  <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'readme' ? 'text-primary drop-shadow-[0_0_8px_rgba(163,44,196,0.4)]' : 'text-primary'}`}>description</span>
                   <h4 className="font-semibold text-on-surface">README</h4>
                   <p className="text-xs text-on-surface-variant mt-1">Technical documentation for code</p>
                 </div>
@@ -102,7 +102,7 @@ export default function Configure() {
                   </div>
                 </div>
                 <div className="mt-4 relative transition-transform duration-300">
-                  <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'research_paper' ? 'text-primary drop-shadow-[0_0_8px_rgba(36,56,156,0.3)]' : 'text-primary'}`}>search</span>
+                  <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'research_paper' ? 'text-primary drop-shadow-[0_0_8px_rgba(163,44,196,0.4)]' : 'text-primary'}`}>search</span>
                   <h4 className="font-semibold text-on-surface">Research Paper</h4>
                   <p className="text-xs text-on-surface-variant mt-1">Data-heavy scholarly structure</p>
                 </div>
@@ -126,7 +126,7 @@ export default function Configure() {
                    </div>
                  </div>
                  <div className="mt-4 relative transition-transform duration-300">
-                    <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'grant_proposal' ? 'text-primary drop-shadow-[0_0_8px_rgba(36,56,156,0.3)]' : 'text-primary'}`}>request_quote</span>
+                    <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'grant_proposal' ? 'text-primary drop-shadow-[0_0_8px_rgba(163,44,196,0.4)]' : 'text-primary'}`}>request_quote</span>
                     <h4 className="font-semibold text-on-surface">Grant Proposal</h4>
                     <p className="text-xs text-on-surface-variant mt-1">Persuasive business alignment</p>
                  </div>
@@ -150,7 +150,7 @@ export default function Configure() {
                    </div>
                  </div>
                  <div className="mt-4 relative transition-transform duration-300">
-                    <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'walkthrough' ? 'text-primary drop-shadow-[0_0_8px_rgba(36,56,156,0.3)]' : 'text-primary'}`}>format_list_numbered</span>
+                    <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'walkthrough' ? 'text-primary drop-shadow-[0_0_8px_rgba(163,44,196,0.4)]' : 'text-primary'}`}>format_list_numbered</span>
                     <h4 className="font-semibold text-on-surface">Code Walkthrough</h4>
                     <p className="text-xs text-on-surface-variant mt-1">Step-by-step technical guide</p>
                  </div>
@@ -172,7 +172,7 @@ export default function Configure() {
                    </div>
                  </div>
                  <div className="mt-4 relative transition-transform duration-300">
-                    <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'poc' ? 'text-primary drop-shadow-[0_0_8px_rgba(36,56,156,0.3)]' : 'text-primary'}`}>science</span>
+                    <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'poc' ? 'text-primary drop-shadow-[0_0_8px_rgba(163,44,196,0.4)]' : 'text-primary'}`}>science</span>
                     <h4 className="font-semibold text-on-surface">Proof of Concept</h4>
                     <p className="text-xs text-on-surface-variant mt-1">Business-professional evaluation</p>
                  </div>
@@ -196,7 +196,7 @@ export default function Configure() {
                    </div>
                  </div>
                  <div className="mt-4 relative transition-transform duration-300">
-                    <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'order_in_council' ? 'text-primary drop-shadow-[0_0_8px_rgba(36,56,156,0.3)]' : 'text-primary'}`}>gavel</span>
+                    <span className={`material-symbols-outlined mb-2 transition-colors duration-300 ${architecture === 'order_in_council' ? 'text-primary drop-shadow-[0_0_8px_rgba(163,44,196,0.4)]' : 'text-primary'}`}>gavel</span>
                     <h4 className="font-semibold text-on-surface">Order in Council</h4>
                     <p className="text-xs text-on-surface-variant mt-1">Strict formal legal framing</p>
                  </div>

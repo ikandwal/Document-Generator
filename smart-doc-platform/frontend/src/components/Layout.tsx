@@ -1,15 +1,16 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 const navLinks = [
-  { path: '/', icon: 'edit_document', label: 'Drafts' },
+  { path: '/', icon: 'menu_book', label: 'Home' },
+  { path: '/drafts', icon: 'description', label: 'Drafts', badge: 3 },
   { path: '/configure', icon: 'style', label: 'Templates' },
   { path: '/library', icon: 'folder_open', label: 'Library' },
-  { path: '/settings', icon: 'settings', label: 'Settings' },
 ];
 
-const bottomLinks = [
-  { path: '/support', icon: 'help', label: 'Support' },
-  { path: '/archive', icon: 'archive', label: 'Archive' },
+const toolLinks = [
+  { path: '/ai-writer', icon: 'precision_manufacturing', label: 'AI Writer' },
+  { path: '/research', icon: 'search', label: 'Research Helper' },
+  { path: '/paraphraser', icon: 'text_snippet', label: 'Paraphraser' },
 ];
 
 export function Layout() {
@@ -17,85 +18,109 @@ export function Layout() {
   const currentPath = location.pathname;
   const navigate = useNavigate();
 
-  const isActive = (p: string) => currentPath === p;
+  const isActive = (p: string) => currentPath === p || (p === '/' && currentPath === '/'); // Adjust as needed
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background font-body print:block print:h-auto print:bg-white print:overflow-visible">
+    <div className="flex h-screen overflow-hidden bg-[#f8fafc] font-body print:block print:h-auto print:bg-white print:overflow-visible">
       {/* SideNavBar */}
-      <aside className="flex flex-col h-screen p-4 gap-4 w-64 bg-[#eceef0] transition-all duration-200 shrink-0 print:hidden">
-        <div className="flex items-center gap-3 px-2 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-studio-gradient flex items-center justify-center text-on-primary">
-            <span className="material-symbols-outlined text-sm">science</span>
+      <aside className="flex flex-col h-screen py-6 px-4 gap-6 w-[260px] bg-white transition-all duration-200 shrink-0 border-r border-slate-200/50 print:hidden shadow-[4px_0_24px_rgba(0,0,0,0.01)]">
+        {/* Logo Area */}
+        <div className="flex items-center gap-3 px-2 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#cc66ff] to-[#a32cc4] flex items-center justify-center text-white shadow-md">
+            <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
           </div>
           <div>
-            <h2 className="font-headline font-bold text-[#191c1e] text-base leading-tight">Lab Workspace</h2>
-            <p className="text-[10px] uppercase tracking-wider text-on-surface-variant font-semibold">Local Model Active</p>
+            <h2 className="font-headline font-extrabold text-slate-800 text-[17px] leading-tight tracking-tight">Synthetix<br/>Studio</h2>
+            <p className="text-[10px] text-slate-400 font-bold tracking-wide mt-0.5">Local AI Writing</p>
           </div>
         </div>
 
+        {/* New Document Button */}
         <button
           onClick={() => navigate('/')}
-          className="bg-studio-gradient text-on-primary px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-sm transition-all duration-200 hover:opacity-90 mt-2 mb-4"
+          className="w-full bg-[#a32cc4] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(163,44,196,0.3)] transition-transform duration-200 hover:-translate-y-0.5 text-sm"
         >
-          <span className="material-symbols-outlined text-sm">add</span>
+          <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
           New Document
         </button>
 
-        <nav className="flex-1 flex flex-col gap-1">
-          {navLinks.map(link => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive(link.path) ? 'bg-[#ffffff] text-[#24389c] shadow-sm font-medium' : 'text-[#454652] hover:bg-[#e6e8ea]'}`}
-            >
-              <span className="material-symbols-outlined">{link.icon}</span>
-              <span>{link.label}</span>
-            </Link>
-          ))}
+        {/* Primary Navigation */}
+        <nav className="flex flex-col gap-1.5 mt-2">
+          {navLinks.map(link => {
+            const active = isActive(link.path);
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ${active ? 'bg-[#fdf4ff] text-[#a32cc4] font-bold' : 'text-slate-500 hover:bg-slate-50 font-semibold'}`}
+              >
+                <div className="flex items-center gap-3 text-sm">
+                  <span className={`material-symbols-outlined text-[22px] ${active ? 'text-[#a32cc4]' : 'text-slate-400'}`} style={active ? {fontVariationSettings: "'FILL' 1"} : {}}>{link.icon}</span>
+                  <span>{link.label}</span>
+                </div>
+                {link.badge && (
+                  <div className="w-5 h-5 rounded-full bg-[#a32cc4] text-white flex items-center justify-center text-[10px] font-bold">
+                    {link.badge}
+                  </div>
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="pt-4 border-t border-outline-variant/30 flex flex-col gap-1 mt-auto">
-          {bottomLinks.map(link => (
+        {/* Tools Navigation */}
+        <div className="flex flex-col gap-1.5 mt-4">
+          <div className="px-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Tools</div>
+          {toolLinks.map(link => (
             <Link
               key={link.path}
               to={link.path}
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${isActive(link.path) ? 'bg-[#ffffff] text-[#24389c] shadow-sm font-medium' : 'text-[#454652] hover:bg-[#e6e8ea]'}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 font-semibold text-sm`}
             >
-              <span className="material-symbols-outlined">{link.icon}</span>
+              <span className="material-symbols-outlined text-[22px] text-slate-400">{link.icon}</span>
               <span>{link.label}</span>
             </Link>
           ))}
         </div>
+
+        {/* Settings */}
+        <div className="mt-auto flex flex-col gap-1">
+           <Link to="/settings" className="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+             <span className="material-symbols-outlined text-[22px] text-slate-400">settings</span>
+             <span>Settings</span>
+           </Link>
+        </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden bg-surface relative print:block print:overflow-visible">
+      <main className="flex-1 flex flex-col overflow-hidden relative print:block print:overflow-visible bg-[#f8faff]">
         {/* TopAppBar */}
-        <header className="flex justify-between items-center px-8 h-16 w-full max-w-none bg-[#f8f9fb] font-headline tracking-tight antialiased z-10 shrink-0 print:hidden">
-          <div className="flex items-center gap-6">
-            <span className="text-xl font-bold tracking-[-0.02em] text-[#191c1e]">Synthetix Studio</span>
-            <div className="h-4 w-px bg-outline-variant/30 hidden md:block"></div>
-            <div className="hidden md:flex items-center gap-2 bg-tertiary-container px-3 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-tertiary-fixed"></span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-tertiary-fixed">Model Status: Local FLAN</span>
+        <header className="flex justify-between items-center px-12 h-[88px] w-full max-w-none bg-transparent font-headline tracking-tight antialiased z-10 shrink-0 print:hidden">
+          <div className="flex items-center gap-8 text-slate-500 text-sm font-semibold">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px] text-slate-400">shield_locked</span>
+              <span>Local & Secure</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px] text-slate-400">bolt</span>
+              <span>Lightning Fast</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px] text-slate-400">psychology</span>
+              <span>AI-Powered</span>
             </div>
           </div>
-          <div className="flex items-center gap-6">
-            <nav className="flex items-center gap-6 text-sm">
-              <Link to="/library" className={`font-semibold py-5 border-b-2 transition-colors ${isActive('/library') ? 'text-[#24389c] border-[#24389c]' : 'text-on-surface-variant border-transparent hover:text-on-surface'}`}>History</Link>
-            </nav>
-            <div className="flex items-center gap-4">
-              <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#eceef0] transition-colors text-on-surface-variant">
-                <span className="material-symbols-outlined">sensors</span>
-              </button>
-              <div className="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
-                <img alt="User profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNDF9bsqUIduK3uTBZkH5LhKuQw3zVsScuMWSR9HPffncGBiODkzHEqaX8zh8LRX29wfoaXsKK4Q__2rFi70XhEs4n2vDCL-1Fbqfcf2Ng5Qp9dz2xTPMKLSlTr5pInNfM9drNdxp_xHvoAbSe8jq9fPq7ykEp6y77owtJyTYBSGR4dkR_ZHHe7h22RvTejxjfarinkyCm9znyqrYnOxJiY0LpWeNO60JOroDGsG-q3amfr6VhQ6htrpS2J3b8wumpt05rwXUkyDA"/>
-              </div>
+          <div className="flex items-center gap-8">
+            <Link to="/library" className="text-slate-500 font-bold hover:text-slate-800 transition-colors">History</Link>
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f97316] text-white font-bold tracking-wider shadow-sm text-sm">
+              JS
             </div>
           </div>
         </header>
 
         {/* Dynamic Content */}
-        <Outlet />
+        <div className="flex-1 overflow-y-auto no-scrollbar relative w-full flex flex-col items-center">
+            <Outlet />
+        </div>
       </main>
     </div>
   );
