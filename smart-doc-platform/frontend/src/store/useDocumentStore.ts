@@ -48,6 +48,8 @@ interface DocumentState {
   
   // Save/Load State
   savedDocuments: any[];
+  setSavedDocuments: (docs: any[]) => void;
+  clearDocuments: () => void;
   loadDocument: (doc: any) => void;
 }
 
@@ -121,6 +123,8 @@ Key considerations include thermal constraints and battery depletion on consumer
       savedDocuments: [newDoc, ...state.savedDocuments]
     };
   }),
+  setSavedDocuments: (docs) => set({ savedDocuments: docs }),
+  clearDocuments: () => set({ savedDocuments: [] }),
   updateDocumentData: (title, sections) => set((state) => ({
     documentData: state.documentData ? { ...state.documentData, title, sections } : null
   })),

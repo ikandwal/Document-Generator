@@ -1,5 +1,7 @@
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDocumentStore } from '../store/useDocumentStore';
+import { getDocuments } from '../services/api';
 
 const typeIcon: Record<string, string> = {
   'Research Paper': 'search',
@@ -10,7 +12,33 @@ const typeIcon: Record<string, string> = {
 
 export default function Library() {
   const navigate = useNavigate();
-  const { savedDocuments, loadDocument } = useDocumentStore();
+  const { savedDocuments, setSavedDocuments, loadDocument } = useDocumentStore();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDocs = async () => {
+      try {
+        const docs = await getDocuments();
+        // Map backend docs to the format expected by the frontend
+        const mappedDocs = docs.map((doc: any) => ({
+          id: doc.doc_id.toString(),
+          title: doc.title,
+          type: 'College Report', // Fallback or extract from title/metadata if saved
+          date: new Date(doc.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          tokens: 0, // Mock for now
+          tone: 'Formal',
+          documentData: JSON.parse(doc.generated_content || '{}'),
+          architecture: 'college_report',
+        }));
+        setSavedDocuments(mappedDocs);
+      } catch (err) {
+        console.error('Failed to fetch documents', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDocs();
+  }, []);
 
   const handleOpenDocument = (doc: any) => {
     loadDocument(doc);

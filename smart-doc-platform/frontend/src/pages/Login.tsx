@@ -1,15 +1,26 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../services/api';
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Temporary bypass for demonstration purposes:
-    navigate('/');
+    setError('');
+    setLoading(true);
+    try {
+      await login(email, password);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Failed to login. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -88,6 +99,13 @@ export default function Login() {
             <span className="bg-white px-4 text-xs text-slate-400 relative">Or continue with email</span>
           </div>
 
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl flex items-center gap-3">
+              <span className="material-symbols-outlined text-lg">error</span>
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
@@ -133,15 +151,16 @@ export default function Login() {
 
             <button 
               type="submit" 
-              className="w-full flex items-center justify-center gap-2 bg-[#a32cc4] hover:bg-[#8a2be2] text-white py-3 rounded-xl font-bold transition-all shadow-[0_4px_14px_rgba(163,44,196,0.39)] hover:shadow-[0_6px_20px_rgba(138,43,226,0.23)] hover:-translate-y-0.5 active:translate-y-0"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-[#a32cc4] hover:bg-[#8a2be2] text-white py-3 rounded-xl font-bold transition-all shadow-[0_4px_14px_rgba(163,44,196,0.39)] hover:shadow-[0_6px_20px_rgba(138,43,226,0.23)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
             >
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
           </form>
 
           <p className="text-center mt-8 text-sm text-slate-500 font-medium">
-            Don't have an account? <a href="#" className="font-bold text-[#a32cc4] hover:text-[#8a2be2] ml-1 transition-colors">Sign Up</a>
+            Don't have an account? <Link to="/signup" className="font-bold text-[#a32cc4] hover:text-[#8a2be2] ml-1 transition-colors">Sign Up</Link>
           </p>
         </div>
       </div>

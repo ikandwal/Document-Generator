@@ -149,7 +149,7 @@ export default function AgentProgress() {
 
             {generationError && (
               <button
-                onClick={() => { resetGeneration(); navigate('/'); }}
+                onClick={() => { resetGeneration(); navigate('/dashboard'); }}
                 className="w-full border border-outline-variant/30 text-on-surface-variant font-semibold py-3 px-5 rounded-xl flex items-center justify-center gap-2 hover:bg-surface-container transition-all"
               >
                 <span className="material-symbols-outlined">refresh</span>

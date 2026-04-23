@@ -1,6 +1,26 @@
 import { useState } from 'react';
 
-const sections = [
+type SettingType = 'select' | 'input' | 'slider' | 'toggle' | 'button';
+
+interface Setting {
+  label: string;
+  type: SettingType;
+  value?: string | number | boolean;
+  options?: string[];
+  min?: number;
+  max?: number;
+  step?: number;
+  buttonLabel?: string;
+}
+
+interface Section {
+  id: string;
+  icon: string;
+  label: string;
+  settings: Setting[];
+}
+
+const sections: Section[] = [
   {
     id: 'model',
     icon: 'memory',
@@ -104,7 +124,7 @@ export default function Settings() {
                   )}
                   {setting.type === 'select' && (
                     <select className="bg-surface-container text-sm text-on-surface rounded-lg px-3 py-2 ring-1 ring-inset ring-outline-variant/20 outline-none focus:ring-primary/30 transition-all">
-                      {setting.options?.map(opt => <option key={opt}>{opt}</option>)}
+                      {setting.options?.map((opt: string) => <option key={opt}>{opt}</option>)}
                     </select>
                   )}
                   {setting.type === 'input' && (

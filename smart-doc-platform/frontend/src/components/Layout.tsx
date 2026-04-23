@@ -1,8 +1,18 @@
+import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { getProfile } from '../services/api';
+import { useDocumentStore } from '../store/useDocumentStore';
 
-const navLinks = [
-  { path: '/', icon: 'menu_book', label: 'Home' },
-  { path: '/drafts', icon: 'description', label: 'Drafts', badge: 3 },
+interface NavLink {
+  path: string;
+  icon: string;
+  label: string;
+  badge?: number;
+}
+
+const navLinks: NavLink[] = [
+  { path: '/dashboard', icon: 'menu_book', label: 'Home' },
+  { path: '/drafts', icon: 'description', label: 'Drafts' },
   { path: '/configure', icon: 'style', label: 'Templates' },
   { path: '/library', icon: 'folder_open', label: 'Library' },
 ];
@@ -13,12 +23,42 @@ const toolLinks = [
   { path: '/paraphraser', icon: 'text_snippet', label: 'Paraphraser' },
 ];
 
+import ProfileModal from './ProfileModal';
+
 export function Layout() {
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
+  const [showProfile, setShowProfile] = useState(false);
+  const [userInitials, setUserInitials] = useState('JS');
 
-  const isActive = (p: string) => currentPath === p || (p === '/' && currentPath === '/'); // Adjust as needed
+  useEffect(() => {
+    const fetchInitials = async () => {
+      try {
+        const profile = await getProfile();
+        if (profile.name) {
+          const parts = profile.name.trim().split(' ');
+          const initials = parts.length >= 2 
+            ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+            : profile.name.slice(0, 2).toUpperCase();
+          setUserInitials(initials);
+        }
+      } catch (err) {
+        console.error('Failed to fetch user initials', err);
+      }
+    };
+    fetchInitials();
+  }, [showProfile]); // Re-fetch when profile modal closes in case name changed
+
+  const { clearDocuments } = useDocumentStore();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    clearDocuments();
+    navigate('/login');
+  };
+
+  const isActive = (path: string) => currentPath === path;
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f8fafc] font-body print:block print:h-auto print:bg-white print:overflow-visible">
@@ -37,7 +77,7 @@ export function Layout() {
 
         {/* New Document Button */}
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className="w-full bg-[#a32cc4] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(163,44,196,0.3)] transition-transform duration-200 hover:-translate-y-0.5 text-sm"
         >
           <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
@@ -83,12 +123,19 @@ export function Layout() {
           ))}
         </div>
 
-        {/* Settings */}
+        {/* Settings and Logout */}
         <div className="mt-auto flex flex-col gap-1">
            <Link to="/settings" className="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
              <span className="material-symbols-outlined text-[22px] text-slate-400">settings</span>
              <span>Settings</span>
            </Link>
+           <button 
+             onClick={handleLogout}
+             className="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-red-500 hover:bg-red-50 font-semibold text-sm w-full text-left"
+           >
+             <span className="material-symbols-outlined text-[22px] text-red-400">logout</span>
+             <span>Logout</span>
+           </button>
         </div>
       </aside>
 
@@ -111,8 +158,11 @@ export function Layout() {
           </div>
           <div className="flex items-center gap-8">
             <Link to="/library" className="text-slate-500 font-bold hover:text-slate-800 transition-colors">History</Link>
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f97316] text-white font-bold tracking-wider shadow-sm text-sm">
-              JS
+            <div 
+              onClick={() => setShowProfile(true)}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f97316] text-white font-bold tracking-wider shadow-sm text-sm cursor-pointer hover:bg-[#ea580c] transition-colors"
+            >
+              {userInitials}
             </div>
           </div>
         </header>
@@ -121,6 +171,11 @@ export function Layout() {
         <div className="flex-1 overflow-y-auto no-scrollbar relative w-full flex flex-col items-center">
             <Outlet />
         </div>
+
+        <ProfileModal 
+          isOpen={showProfile} 
+          onClose={() => setShowProfile(false)} 
+        />
       </main>
     </div>
   );

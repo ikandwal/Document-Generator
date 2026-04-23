@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useDocumentStore } from '../store/useDocumentStore';
-import { generateDocument } from '../services/api';
+import { generateDocument, saveDocument } from '../services/api';
 
 export default function Configure() {
   const navigate = useNavigate();
@@ -25,6 +25,13 @@ export default function Configure() {
         architectureSubtype,
         (stage) => setGenerationStage(stage)
       );
+      
+      try {
+        await saveDocument(result.title || 'Untitled', sourceText, JSON.stringify(result));
+      } catch (saveErr) {
+        console.error('Failed to save to backend', saveErr);
+      }
+
       setDocumentData(result);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown error occurred.';

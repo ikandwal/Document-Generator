@@ -1,14 +1,38 @@
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { useDocumentStore } from '../store/useDocumentStore';
+import { getDocuments } from '../services/api';
 
 export default function HomeInput() {
   const navigate = useNavigate();
   const { 
     sourceText, setSourceText, 
     uploadedFiles, addUploadedFiles, 
-    savedDocuments
+    savedDocuments, setSavedDocuments
   } = useDocumentStore();
+
+  useEffect(() => {
+    const fetchRecent = async () => {
+      try {
+        const docs = await getDocuments();
+        const mappedDocs = docs.map((doc: any) => ({
+          id: doc.doc_id.toString(),
+          title: doc.title,
+          type: 'College Report',
+          date: new Date(doc.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          tokens: 0,
+          tone: 'Formal',
+          documentData: JSON.parse(doc.generated_content || '{}'),
+          architecture: 'college_report',
+        }));
+        setSavedDocuments(mappedDocs);
+      } catch (err) {
+        console.error('Failed to fetch recent docs', err);
+      }
+    };
+    fetchRecent();
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {

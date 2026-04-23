@@ -26,8 +26,20 @@ app.add_middleware(
 )
 
 # Include routers
-from routers import generate
+from routers import generate, auth, documents
+import models
+from database import engine
+
+# Create database tables
+models.Base.metadata.create_all(bind=engine)
+
+app.include_router(auth.router)
 app.include_router(generate.router)
+app.include_router(documents.router)
+
+@app.get("/")
+async def root():
+    return {"message": "Smart Documentation Automation Platform API is running. Visit /docs for documentation."}
 
 @app.get("/health")
 async def health_check():
